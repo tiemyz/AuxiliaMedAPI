@@ -30,6 +30,7 @@ public class Usuario implements UserDetails {
     private String nome;
     private String email;
     private String senha;
+    private String tipoUsuario;
 
     @Override
     public String getPassword() {
@@ -65,5 +66,4 @@ public class Usuario implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(new SimpleGrantedAuthority("ROLE_USER"));
     }
-
 }

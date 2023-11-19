@@ -15,6 +15,9 @@ import br.com.fiap.AuxiliaMedAPI.models.Credencial;
 import br.com.fiap.AuxiliaMedAPI.models.Token;
 import br.com.fiap.AuxiliaMedAPI.models.Usuario;
 import br.com.fiap.AuxiliaMedAPI.repository.UsuarioRepository;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 
 @Service
 public class TokenService {
@@ -25,27 +28,31 @@ public class TokenService {
     @Value("${jwt.secret}")
     String secret;
 
+    private Algorithm getAlgorithm() {
+        byte[] secretBytes = Base64.getDecoder().decode(secret.getBytes(StandardCharsets.UTF_8));
+        return Algorithm.HMAC256(secretBytes);
+    }
+
     public Token generateToken(Credencial credencial) {
-        Algorithm alg = Algorithm.HMAC256(secret);
+        Algorithm alg = getAlgorithm();
         var token = JWT.create()
                     .withSubject(credencial.email())
                     .withIssuer("AuxiliaMed")
                     .withExpiresAt(Instant.now().plus(20, ChronoUnit.MINUTES))
-                    .sign(alg)
-                    ;
+                    .sign(alg);
+
         return new Token(token, "JWT", "Bearer");
     }
 
     public Usuario getUserByToken(String token) {
-        Algorithm alg = Algorithm.HMAC256(secret);
+        Algorithm alg = getAlgorithm();
         var email = JWT.require(alg)
                     .withIssuer("AuxiliaMed")
                     .build()
                     .verify(token)
                     .getSubject();
-                ;
+
         return usuarioRepository.findByEmail(email)
                     .orElseThrow(() -> new JWTVerificationException("Usuario invalido"));
     }
-    
 }
