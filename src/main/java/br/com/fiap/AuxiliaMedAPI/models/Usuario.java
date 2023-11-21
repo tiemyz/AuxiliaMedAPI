@@ -16,12 +16,12 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+//@Table(name = "T_AM_USUARIO")
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "T_AM_USUARIO")
 public class Usuario implements UserDetails {
 
     @Id
